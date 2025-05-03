@@ -93,30 +93,45 @@ def recommendation():
 @app.route("/recommend", methods=['GET', 'POST'])
 def recommend():
     if request.method == "POST":
-        user_id = request.form['user_id']
-        user_id = int(user_id)
-        # Capture form data
-        user_input = {
-            'Name_x': request.form['name'],
-            'Type': request.form['type'],
-            'State': request.form['state'],
-            'BestTimeToVisit': request.form['best_time'],
-            'Preferences': request.form['preferences'],
-            'Gender': request.form['gender'],
-            'NumberOfAdults': request.form['adults'],
-            'NumberOfChildren': request.form['children'],
-        }
+        try:
+            # Validate number of adults and children
+            num_adults = int(request.form['adults'])
+            num_children = int(request.form['children'])
+            
+            if num_adults < 1 or num_adults > 10:
+                return render_template('recommendation.html', 
+                    error="Number of adults must be between 1 and 10")
+            
+            if num_children < 0 or num_children > 10:
+                return render_template('recommendation.html', 
+                    error="Number of children must be between 0 and 10")
 
-        # Collaborative filtering function
-        recommended_destinations = collaborative_recommend(user_id, user_similarity,
+            user_id = int(request.form['user_id'])
+            
+            # Rest of your existing code...
+            user_input = {
+                'Name_x': request.form['name'],
+                'Type': request.form['type'],
+                'State': request.form['state'],
+                'BestTimeToVisit': request.form['best_time'],
+                'Preferences': request.form['preferences'],
+                'Gender': request.form['gender'],
+                'NumberOfAdults': num_adults,
+                'NumberOfChildren': num_children,
+            }
+
+            recommended_destinations = collaborative_recommend(user_id, user_similarity,
                                                            user_item_matrix, destinations_df)
+            predicted_popularity = recommend_destinations(user_input, model, label_encoders, features, df)
 
-        # Prediction function for popularity (if applicable)
-        predicted_popularity = recommend_destinations(user_input, model, label_encoders, features, df)
-
-        # Render the recommendation page with recommendations
-        return render_template('recommendation.html', recommended_destinations=recommended_destinations,
-                               predicted_popularity=predicted_popularity)
+            return render_template('recommendation.html', 
+                                recommended_destinations=recommended_destinations,
+                                predicted_popularity=predicted_popularity)
+                                
+        except ValueError:
+            return render_template('recommendation.html', 
+                error="Please enter valid numbers for adults and children")
+            
     return render_template('recommendation.html')
 
 

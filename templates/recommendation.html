@@ -51,6 +51,11 @@
                     <h1 class="text-center">Travel Recommendation System</h1>
                     <p class="text-center">Enter your details to get personalized travel recommendations</p>
                     <form action="/recommend" method="POST">
+                        {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                        {% endif %}
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="userId" class="form-label">User ID</label>
@@ -123,11 +128,15 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="adults" class="form-label">Number of Adults</label>
-                                <input type="number" id="adults" name="adults" class="form-control" placeholder="Enter number of adults" required>
+                                <input type="number" id="adults" name="adults" class="form-control" 
+                                       min="1" max="10" placeholder="Enter number of adults" required
+                                       oninput="validateNumber(this)">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="children" class="form-label">Number of Children</label>
-                                <input type="number" id="children" name="children" class="form-control" placeholder="Enter number of children" required>
+                                <input type="number" id="children" name="children" class="form-control" 
+                                       min="0" max="10" placeholder="Enter number of children" required
+                                       oninput="validateNumber(this)">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-custom mt-3">Get Recommendations</button>
@@ -174,5 +183,20 @@
             </div>
         </div>
     </div>
+    <script>
+    function validateNumber(input) {
+        const value = parseInt(input.value);
+        const min = parseInt(input.min);
+        const max = parseInt(input.max);
+        
+        if (value < min) {
+            input.value = min;
+            alert(`Value cannot be less than ${min}`);
+        } else if (value > max) {
+            input.value = max;
+            alert(`Value cannot be more than ${max}`);
+        }
+    }
+    </script>
 </body>
 </html>
