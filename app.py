@@ -9,12 +9,12 @@ app = Flask(__name__)
 
 # Load datasets and models
 features = ['Name_x', 'State', 'Type', 'BestTimeToVisit', 'Preferences', 'Gender', 'NumberOfAdults', 'NumberOfChildren']
-model = pickle.load(open('code and dataset/model.pkl','rb'))
-label_encoders = pickle.load(open('code and dataset/label_encoders.pkl','rb'))
+model = pickle.load(open('model.pkl','rb'))
+label_encoders = pickle.load(open('label_encoders.pkl','rb'))
 
-destinations_df = pd.read_csv("code and dataset/Expanded_Destinations.csv")
-userhistory_df = pd.read_csv("code and dataset/Final_Updated_Expanded_UserHistory.csv")
-df = pd.read_csv("code and dataset/final_df.csv")
+destinations_df = pd.read_csv("Expanded_Destinations.csv")
+userhistory_df = pd.read_csv("Final_Updated_Expanded_UserHistory.csv")
+df = pd.read_csv("final_df.csv")
 
 
 # Collaborative Filtering Function
