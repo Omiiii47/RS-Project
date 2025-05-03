@@ -94,31 +94,37 @@ def recommendation():
 def recommend():
     if request.method == "POST":
         try:
-            # Validate number of adults and children
+            # Only validate required fields
             num_adults = int(request.form['adults'])
-            num_children = int(request.form['children'])
-            
             if num_adults < 1 or num_adults > 10:
                 return render_template('recommendation.html', 
                     error="Number of adults must be between 1 and 10")
             
+            # Make children optional with default value 0
+            num_children = int(request.form.get('children', 0))
             if num_children < 0 or num_children > 10:
                 return render_template('recommendation.html', 
                     error="Number of children must be between 0 and 10")
 
             user_id = int(request.form['user_id'])
             
-            # Rest of your existing code...
+            # Create user_input with default values for optional fields
             user_input = {
-                'Name_x': request.form['name'],
-                'Type': request.form['type'],
-                'State': request.form['state'],
-                'BestTimeToVisit': request.form['best_time'],
-                'Preferences': request.form['preferences'],
-                'Gender': request.form['gender'],
+                'Name_x': request.form.get('name', ''),
+                'Type': request.form.get('type', ''),
+                'State': request.form.get('state', ''),
+                'BestTimeToVisit': request.form.get('best_time', ''),
+                'Preferences': request.form.get('preferences', ''),
+                'Gender': request.form.get('gender', ''),
                 'NumberOfAdults': num_adults,
                 'NumberOfChildren': num_children,
             }
+
+            # If optional field is empty, use most popular value from training data
+            for feature in features:
+                if not user_input[feature] and feature in label_encoders:
+                    # Use most common value from training data
+                    user_input[feature] = df[feature].mode()[0]
 
             recommended_destinations = collaborative_recommend(user_id, user_similarity,
                                                            user_item_matrix, destinations_df)
